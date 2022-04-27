@@ -232,18 +232,18 @@ int handle_client(const struct client_t * client)
             char rep[] = "230 User logged in, proceed\r\n";
             SSL_write(client->ssl, rep, strlen(rep));
         }
-        else if(strcmp(command, "SYST\r\n") == 0 || strcmp(command, "SYST") == 0)
+        else if(strcmp(command, "SYST") == 0 || strcmp(command, "SYST\r\n") == 0)
         {
             char rep[] = "215 UNIX Type: L8\r\n";
             SSL_write(client->ssl, rep, strlen(rep));
         }
-        else if(strcmp(command, "FEAT\r\n") == 0 || strcmp(command, "FEAT") == 0)
+        else if(strcmp(command, "FEAT") == 0 || strcmp(command, "FEAT\r\n") == 0)
         {
                 
             char rep[] = "211 UNIX Type: L8\r\n";
             SSL_write(client->ssl, rep, strlen(rep));
         }
-        else if (strcmp(command, "PASV\r\n") == 0 || strcmp(command, "PASV") == 0) 
+        else if (strcmp(command, "PASV") == 0 || strcmp(command, "PASV\r\n") == 0) 
         {
             srand(time(NULL));
             int p1 = 128 + (rand() % 64);
@@ -263,7 +263,7 @@ int handle_client(const struct client_t * client)
             char rep[] = "200 PROT now Private\r\n";
             SSL_write(client->ssl, rep, strlen(rep));
         }
-        else if(strcmp(command, "PWD\r\n") == 0 || strcmp(command, "PWD") == 0)
+        else if(strcmp(command, "PWD") == 0 || strcmp(command, "PWD\r\n") == 0)
         {
             char rep[50];
             sprintf(rep, "257 %s\r\n", dir);
@@ -530,7 +530,7 @@ int handle_client(const struct client_t * client)
                 }
             }
         }
-        else if (strcmp(command, "MKD\r\n") == 0 || strcmp(command, "MKD") == 0)
+        else if (strcmp(command, "MKD") == 0 || strcmp(command, "MKD\r\n") == 0)
         {
 
             chdir(dir);
@@ -557,25 +557,21 @@ int handle_client(const struct client_t * client)
                 SSL_write(client->ssl, rep, strlen(rep));
             }
         }
-        else if (strcmp(command, "DELE\r\n") == 0 || strcmp(command, "DELE") == 0)
+        else if (strcmp(command, "DELE") == 0 || strcmp(command, "DELE\r\n") == 0)
         {
-
             chdir(dir);
             char d[100]; 
             int i = 0, c = 0;
             int slashes=0;
             for(; i < strlen(arg); i++)
             {
-                if(arg[i] == '/')
-                    slashes++;
-                if ((isalnum(arg[i]) || arg[i] == '.' || arg[i] == '_' || arg[i] == '-') && slashes==2)
+                if ((isalnum(arg[i]) || arg[i] == '.' || arg[i] == '_' || arg[i] == '-') || arg[i] == '/')
                 {
-                    d[c] = arg[i];
-                    c++;
+                    d[c] = arg[i]; c++;
                 }
             } 
                 d[c] = '\0';
-            printf("%s\n", d);
+
             if (remove(d) == 0) {
                 char rep[] = "250 Succesfully deleted.\r\n";
                 SSL_write(client->ssl, rep, strlen(rep));
